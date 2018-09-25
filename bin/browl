@@ -1,0 +1,172 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const pkg = require('../package.json');
+const yargs = require('yargs');
+const options = require('../lib/options');
+const deploy = require('../');
+const deployBulk = deploy.bulk;
+
+const argv = yargs
+  .usage('Usage: $0 <command> [options]')
+  .help('help')
+  .alias('help', 'h')
+  .version(pkg.version)
+  .alias('version', 'v')
+  .command('list', 'Display a list of deployed instances.')
+  .command('deploy', 'Deploy the instance(s).', function (yargs) {
+    return options(yargs)
+      .repo()
+      .branch()
+      .yargs
+      .example('$0 deploy --repo foo --branch bar')
+      .example('$0 deploy --repo foo --branch bar baz quux')
+      .argv;
+  })
+  .command('delete', 'Delete deployed instance(s).', function (yargs) {
+    return options(yargs)
+      .repo()
+      .branch(false)
+      .all()
+      .force()
+      .yargs
+      .example('$0 delete --repo foo --branch bar')
+      .example('$0 delete --repo foo --branch bar baz quux')
+      .example('$0 delete --repo foo --all')
+      .argv;
+  })
+  .command('start', 'Start a deployed instance(s).', function (yargs) {
+    return options(yargs)
+      .repo()
+      .branch(false)
+      .force()
+      .yargs
+      .example('$0 start --repo foo --branch bar')
+      .example('$0 start --repo foo --branch bar baz quux')
+      .example('$0 start --repo foo --all')
+      .argv;
+  })
+  .command('startall', 'Start all deployed instances.', function (yargs) {
+    return options(yargs)
+      .yargs
+      .example('$0 startall')
+      .argv;
+  })
+  .command('stop', 'stop a deployed instance(s).', function (yargs) {
+    return options(yargs)
+      .repo()
+      .branch(false)
+      .force()
+      .yargs
+      .example('$0 stop --repo foo --branch bar')
+      .example('$0 stop --repo foo --branch bar baz quux')
+      .example('$0 stop --repo foo --all')
+      .argv;
+  })
+  .command('stopall', 'Stop all deployed instances.')
+  .command('restart', 'Restart a deployed instance(s).', function (yargs) {
+    return options(yargs)
+      .repo()
+      .branch(false)
+      .yargs
+      .example('$0 restart --repo foo --branch bar')
+      .example('$0 restart --repo foo --branch bar baz quux')
+      .example('$0 restart --repo foo --all')
+      .argv;
+  })
+  .command('restartall', 'Restart all deployed instances.')
+  .example('$0 deploy --repo foo --branch bar', 'Deploy the instance.')
+  .example('$0 deploy --repo foo --branch bar baz quux', 'Deploy multiple instances.')
+  .example('$0 delete --repo foo --branch bar', 'Delete deployed instance.')
+  .example('$0 delete --repo foo --branch bar baz quux', 'Delete multiple instances.')
+  .example('$0 delete --repo foo --all', 'Delete all deployed instances for repo.')
+  .example('$0 list', 'Display a list of deployed instances.')
+  .example('$0 start --repo foo --branch bar', 'Start a deployed instance.')
+  .example('$0 start --repo foo --branch bar baz quux', 'Start multiple deployed instances.')
+  .example('$0 start --repo foo --all', 'Start all deployed instances for repo.')
+  .example('$0 startall', 'Start all deployed instances.')
+  .example('$0 stop --repo foo --branch bar', 'Stop a deployed instance.')
+  .example('$0 stop --repo foo --branch bar baz quux', 'Stop multiple deployed instances.')
+  .example('$0 stop --repo foo --all', 'Stop all deployed instances for repo.')
+  .example('$0 stopall', 'Stop all deployed instances.')
+  .example('$0 restart --repo foo --branch bar', 'Restart a deployed instance.')
+  .example('$0 restart --repo foo --branch bar baz quux', 'Restart multiple deployed instances.')
+  .example('$0 restart --repo foo --all', 'Restart all deployed instances for repo.')
+  .example('$0 restartall', 'Restart all deployed instances.')
+  .wrap(120)
+  .argv;
+const command = argv._[0]; // get first unnamed arg
+const repo = argv.repo;
+const branches = argv.branch || [];
+const deployOptions = {};
+
+let output;
+
+switch (command) {
+  case 'deploy':
+    break;
+
+  case 'delete':
+    deployOptions.delete = true;
+    deployOptions.all = argv.all;
+    deployOptions.force = argv.force;
+    break;
+
+  case 'list':
+    deployOptions.list = true;
+    break;
+
+  case 'start':
+    deployOptions.start = true;
+    deployOptions.force = argv.force;
+    deployOptions.all = argv.all;
+    break;
+
+  case 'stop':
+    deployOptions.stop = true;
+    deployOptions.all = argv.all;
+    break;
+
+  case 'restart':
+    deployOptions.restart = true;
+    deployOptions.all = argv.all;
+    break;
+
+  case 'startall':
+    deployOptions.startall = true;
+    break;
+
+  case 'stopall':
+    deployOptions.stopall = true;
+    break;
+
+  case 'restartall':
+    deployOptions.restartall = true;
+    break;
+
+  default:
+    deployOptions.help = true;
+    break;
+}
+
+if (deployOptions.help) {
+  yargs.showHelp();
+  return;
+}
+
+if (deployOptions.list) {
+  output = deploy(null, null, deployOptions);
+  console.log(output);
+  return;
+}
+
+function main() {
+  return branches.length > 1 ?
+    deployBulk(repo, branches, deployOptions) :
+    deploy(repo, branches[0], deployOptions);
+}
+
+main().catch(function () {
+  process.exit(1);
+});

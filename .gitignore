@@ -1,0 +1,29 @@
+# Node.js
+node_modules
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Temporary folders
+tmp
+
+# Ruby
+*.lock
+
+# Coverage
+.nyc_output
+coverage
+
+# Vagrant
+.vagrant
+
+# Chef
+chef/cookbooks
+!chef/cookbooks/.gitkeep
+.netrc
+id_rsa
+id_rsa.pub
+
+# Envs
+.env

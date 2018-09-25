@@ -1,24 +1,23 @@
 {
   "name": "browl",
   "version": "0.1.0",
+  "description": "A remote server automation and deployment tool written on Node.js",
   "engines": {
     "node": ">= 8"
   },
   "main": "index.js",
-  "license": "MIT",
-  "author": [
-    {
-      "name": "Alexey Kucherenko",
-      "email": "alexei.kucherenko@gmail.com"
-    }
-  ],
-  "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/killmenot/browl"
-  },
   "bin": {
     "browl": "bin/browl"
+  },
+  "license": "MIT",
+  "author": "Alexey Kucherenko <alexei.kucherenko@gmail.com>",
+  "homepage": "https://github.com/killmenot/browl#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/killmenot/browl.git"
+  },
+  "bugs": {
+    "url": "https://github.com/killmenot/browl/issues"
   },
   "scripts": {
     "lint": "eslint config lib test",

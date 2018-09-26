@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const ini = require('ini');
 
-const CONFIG_DIR = process.env.CONFIG_DIR || path.join(os.homedir(), '.browl');
+const CONFIG_DIR = process.env.BROWL_CONFIG_DIR || path.join(os.homedir(), '.browl');
 const CONFIG_INI = path.join(CONFIG_DIR, 'browl.ini');
 const config = ini.parse(fs.readFileSync(CONFIG_INI, 'utf-8'));
 
